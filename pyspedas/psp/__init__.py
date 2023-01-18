@@ -57,9 +57,8 @@ def fields(trange=['2018-11-5', '2018-11-6'],
 
         get_support_data: bool
             Data with an attribute "VAR_TYPE" with a value of "support_data"
-            will be loaded into tplot.  By default, this flag is False but 
-            FIELDS support data is always loaded for datatypes where filtering
-            on quality flags is supported.
+            will be loaded into tplot.  By default, FIELDS support data is loaded
+            to enable filtering on quality flags.
 
         varformat: str
             The file variable formats to load into tplot.  Wildcard character
@@ -141,8 +140,6 @@ def fields(trange=['2018-11-5', '2018-11-6'],
     if loaded_vars is None or notplot or downloadonly:
         return loaded_vars
 
-    qf_root = 'psp_fld_l2_quality_flags'+suffix
-
     # If variables are loaded that quality flag filtering supports --
     # Make sure the quality flag variable is also loaded and linked. 
     mag_rtnvars = [x for x in loaded_vars if 'fld_l2_mag_RTN' in x ]
@@ -152,7 +149,7 @@ def fields(trange=['2018-11-5', '2018-11-6'],
         & ('psp_fld_l2_quality_flags'+suffix not in loaded_vars):
         loaded_extra = load(
             instrument='fields', trange=trange, datatype=datatype, spec_types=spec_types, level=level, 
-            suffix=suffix, get_support_data=True, varformat=varformat, varnames=['psp_fld_l2_quality_flags'],
+            suffix=suffix, get_support_data=True, varformat=varformat, varnames=['psp_fld_l2_quality_flags'], 
             downloadonly=downloadonly, notplot=notplot, time_clip=time_clip, no_update=no_update,
             username=username, password=password
         )
@@ -247,13 +244,20 @@ def spc(trange=['2018-11-5', '2018-11-6'],
         List of tplot variables created.
 
     """
-
-    if datatype == 'l3i':
-        level = 'l3'
-        print("Using LEVEL=L3")
-    elif datatype == 'l2i':
-        level = 'l2'
-        print("Using LEVEL=L2")
+    if username == None:
+        if datatype == 'l3i':
+            level = 'l3'
+            print("Using LEVEL=L3")
+        elif datatype == 'l2i':
+            level = 'l2'
+            print("Using LEVEL=L2")
+    else:
+        if datatype == 'l3i':
+            level = 'L3'
+            print("Using LEVEL=L3 (unpublished)")
+        elif datatype == 'l2i':
+            level = 'L2'
+            print("Using LEVEL=L2 (unpublished)")
 
     return load(instrument='spc', trange=trange, datatype=datatype, level=level, suffix=suffix, 
         get_support_data=get_support_data, varformat=varformat, varnames=varnames, downloadonly=downloadonly, 
